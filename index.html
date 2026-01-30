@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Оклейка РОЛЬФ</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Шаг 1: Выбор комплекта -->
+        <div class="step" id="step1">
+            <h1>🚗 Оклейка автомобиля</h1>
+            <p class="subtitle">Выберите комплект оклейки</p>
+            
+            <div class="packages">
+                <div class="package-card" data-package="1">
+                    <div class="package-header">
+                        <h3>№1 НЕОБХОДИМЫЙ</h3>
+                        <div class="price">31,450 - 42,550₽</div>
+                    </div>
+                    <p class="package-desc">капот, бампер, два крыла, два зеркала или фары</p>
+                </div>
+
+                <div class="package-card" data-package="9">
+                    <div class="package-header">
+                        <h3>№9 БАЗОВЫЙ</h3>
+                        <div class="price">46,750 - 63,250₽</div>
+                    </div>
+                    <p class="package-desc">капот, бампер, защита под ручками</p>
+                </div>
+
+                <div class="package-card" data-package="10">
+                    <div class="package-header">
+                        <h3>№10 ПРЕМИУМ</h3>
+                        <div class="price">55,250 - 74,750₽</div>
+                    </div>
+                    <p class="package-desc">капот, крылья, бампер, защита под ручки, зеркала, фары, стойки</p>
+                </div>
+
+                <div class="package-card" data-package="20">
+                    <div class="package-header">
+                        <h3>№20 МАКСИМУМ</h3>
+                        <div class="price">148,750 - 201,250₽</div>
+                    </div>
+                    <p class="package-desc">кузов полностью</p>
+                </div>
+
+                <div class="package-card custom" data-package="custom">
+                    <div class="package-header">
+                        <h3>✍️ Свой вариант</h3>
+                    </div>
+                    <p class="package-desc">Опишите, что нужно оклеить</p>
+                </div>
+
+                <div class="package-card parts" data-package="parts">
+                    <div class="package-header">
+                        <h3>➕ Подетально</h3>
+                    </div>
+                    <p class="package-desc">Выбор отдельных элементов</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Шаг 2: Дополнительные элементы -->
+        <div class="step hidden" id="step2">
+            <h2>➕ Дополнительные элементы</h2>
+            <p class="subtitle">Выберите элементы (можно несколько)</p>
+            
+            <div class="additional-parts" id="additionalParts"></div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="skipAdditional()">Пропустить</button>
+                <button class="btn btn-primary" onclick="confirmAdditional()">Продолжить</button>
+            </div>
+        </div>
+
+        <!-- Шаг 3: Локация -->
+        <div class="step hidden" id="step3">
+            <h2>📍 Где вы находитесь?</h2>
+            
+            <div class="location-options">
+                <button class="btn btn-primary btn-location" onclick="requestLocation()">
+                    📍 Отправить мою геолокацию
+                </button>
+                
+                <div class="divider">или выберите дилерский центр</div>
+                
+                <select class="select-input" id="dealershipSelect">
+                    <option value="">Выберите дилерский центр...</option>
+                    <option value="Ауди Центр Север|Москва, Ленинградское шоссе, 63Б">Ауди Центр Север</option>
+                    <option value="Звезда Столицы Варшавка|Москва, Варшавское ш., 127">Звезда Столицы Варшавка</option>
+                    <option value="Звезда Столицы Каширка|посёлок Развилка, вл17">Звезда Столицы Каширка</option>
+                    <option value="РОЛЬФ Автогарант Строгино|Москва, ул. Твардовского, 8к4">РОЛЬФ Автогарант Строгино</option>
+                    <option value="РОЛЬФ Вешки|Автомобильный пр., 2А/3, посёлок Вешки">РОЛЬФ Вешки</option>
+                    <option value="РОЛЬФ Волгоградский|Москва, Остаповский проезд вл. 4">РОЛЬФ Волгоградский</option>
+                    <option value="РОЛЬФ Восток|Москва, Рязанский проспект, д. 24, корпус 3">РОЛЬФ Восток</option>
+                    <option value="РОЛЬФ Северо-Запад|г. Москва, МКАД, 71-й км, 16, стр. 2">РОЛЬФ Северо-Запад</option>
+                    <option value="РОЛЬФ Сити|Москва, Ярославское шоссе, 31">РОЛЬФ Сити</option>
+                    <option value="РОЛЬФ Химки|г. Химки, Ленинградское шоссе, вл. 21">РОЛЬФ Химки</option>
+                    <option value="РОЛЬФ Центр|Москва, 2-й Магистральный тупик, 5А">РОЛЬФ Центр</option>
+                    <option value="РОЛЬФ Юг|Москва, ул.Обручева, д.27, корп.1">РОЛЬФ Юг</option>
+                    <option value="РОЛЬФ Юго-Восток|Москва, МКАД, 27-й км, вл. 9">РОЛЬФ Юго-Восток</option>
+                    <option value="РОЛЬФ Ясенево|Москва, район Коммунарка, МКАД, 40-й км, 1">РОЛЬФ Ясенево</option>
+                </select>
+                
+                <div class="divider">или введите адрес</div>
+                
+                <input type="text" class="text-input" id="customAddress" placeholder="Введите адрес...">
+            </div>
+            
+            <button class="btn btn-primary btn-full" onclick="confirmLocation()">Продолжить</button>
+        </div>
+
+        <!-- Шаг 4: Дата и время -->
+        <div class="step hidden" id="step4">
+            <h2>📅 Дата и время</h2>
+            
+            <div class="quick-dates">
+                <button class="date-btn" data-offset="0">Сегодня</button>
+                <button class="date-btn" data-offset="1">Завтра</button>
+                <button class="date-btn" data-offset="2">Послезавтра</button>
+            </div>
+            
+            <div class="divider">или выберите дату</div>
+            
+            <input type="date" class="date-input" id="customDate">
+            
+            <h3>🕐 Время</h3>
+            <div class="time-grid" id="timeGrid"></div>
+            
+            <div class="custom-time">
+                <input type="time" class="time-input" id="customTime" placeholder="Или введите время">
+            </div>
+            
+            <button class="btn btn-primary btn-full" onclick="confirmDateTime()">Продолжить</button>
+        </div>
+
+        <!-- Шаг 5: Фото -->
+        <div class="step hidden" id="step5">
+            <h2>📸 Фотографии автомобиля</h2>
+            <p class="subtitle">Загрузите фото вашего автомобиля</p>
+            
+            <div class="photo-upload">
+                <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+                <button class="btn btn-upload" onclick="document.getElementById('photoInput').click()">
+                    📷 Выбрать фото
+                </button>
+            </div>
+            
+            <div class="photo-preview" id="photoPreview"></div>
+            
+            <button class="btn btn-primary btn-full" onclick="confirmPhotos()" disabled id="btnConfirmPhotos">
+                Продолжить
+            </button>
+        </div>
+
+        <!-- Шаг 6: VIN -->
+        <div class="step hidden" id="step6">
+            <h2>🔢 VIN-номер</h2>
+            <p class="subtitle">Введите VIN-номер автомобиля (17 символов)</p>
+            
+            <input type="text" class="text-input" id="vinInput" placeholder="Например: 1HGBH41JXMN109186" maxlength="17">
+            <div class="input-hint">Буквы I, O, Q не используются</div>
+            <div class="error-message hidden" id="vinError"></div>
+            
+            <button class="btn btn-primary btn-full" onclick="confirmVIN()">Продолжить</button>
+        </div>
+
+        <!-- Шаг 7: Контакты -->
+        <div class="step hidden" id="step7">
+            <h2>📞 Контактные данные</h2>
+            
+            <div class="contact-options">
+                <input type="tel" class="text-input" id="phoneInput" placeholder="+7 (___) ___-__-__">
+                <div class="input-hint">Телефон, email или Telegram</div>
+                <div class="error-message hidden" id="contactError"></div>
+            </div>
+            
+            <button class="btn btn-primary btn-full" onclick="confirmContact()">Продолжить</button>
+        </div>
+
+        <!-- Шаг 8: Подтверждение -->
+        <div class="step hidden" id="step8">
+            <h2>✅ Проверьте заявку</h2>
+            
+            <div class="summary" id="summary"></div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goBack()">Изменить</button>
+                <button class="btn btn-success" onclick="submitOrder()">Отправить заявку</button>
+            </div>
+        </div>
+
+        <!-- Шаг 9: Успех -->
+        <div class="step hidden" id="step9">
+            <div class="success-screen">
+                <div class="success-icon">✅</div>
+                <h2>Заявка отправлена!</h2>
+                <p>Мы свяжемся с вами в ближайшее время</p>
+                <button class="btn btn-primary" onclick="restartApp()">Создать новую заявку</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
