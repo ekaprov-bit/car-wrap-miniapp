@@ -171,10 +171,30 @@
         <!-- Шаг 7: Контакты -->
         <div class="step hidden" id="step7">
             <h2>📞 Контактные данные</h2>
+            <p class="subtitle">Как с вами связаться?</p>
             
             <div class="contact-options">
+                <button class="btn btn-primary btn-full" onclick="sharePhone()" id="sharePhoneBtn">
+                    📱 Поделиться номером телефона
+                </button>
+                
+                <button class="btn btn-secondary btn-full" onclick="useTelegram()">
+                    💬 Использовать мой Telegram
+                </button>
+                
+                <div class="divider">или введите вручную</div>
+                
+                <div class="contact-tabs">
+                    <button class="contact-tab active" onclick="selectContactType('phone')">Телефон</button>
+                    <button class="contact-tab" onclick="selectContactType('email')">Email</button>
+                    <button class="contact-tab" onclick="selectContactType('telegram')">Telegram</button>
+                </div>
+                
                 <input type="tel" class="text-input" id="phoneInput" placeholder="+7 (___) ___-__-__">
-                <div class="input-hint">Телефон, email или Telegram</div>
+                <input type="email" class="text-input hidden" id="emailInput" placeholder="name@example.com">
+                <input type="text" class="text-input hidden" id="telegramInput" placeholder="@username">
+                
+                <div class="input-hint" id="contactHint">Введите номер телефона</div>
                 <div class="error-message hidden" id="contactError"></div>
             </div>
             

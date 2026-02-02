@@ -19,6 +19,7 @@ const orderData = {
     photos: [],
     vin: null,
     contact: null,
+    contactType: null,
     userId: tg.initDataUnsafe?.user?.id || null,
     username: tg.initDataUnsafe?.user?.username || null,
     firstName: tg.initDataUnsafe?.user?.first_name || null
@@ -305,44 +306,155 @@ function confirmVIN() {
 }
 
 // Шаг 7: Контакт
-function confirmContact() {
-    const contactInput = document.getElementById('phoneInput');
-    const contact = contactInput.value.trim();
-    const errorDiv = document.getElementById('contactError');
+let currentContactType = 'phone';
+
+function selectContactType(type) {
+    currentContactType = type;
     
-    if (!contact) {
-        errorDiv.textContent = 'Пожалуйста, введите контакт';
-        errorDiv.classList.remove('hidden');
-        return;
+    // Убираем active со всех табов
+    document.querySelectorAll('.contact-tab').forEach(tab => tab.classList.remove('active'));
+    
+    // Добавляем active к выбранному табу
+    event.target.classList.add('active');
+    
+    // Скрываем все инпуты
+    document.getElementById('phoneInput').classList.add('hidden');
+    document.getElementById('emailInput').classList.add('hidden');
+    document.getElementById('telegramInput').classList.add('hidden');
+    
+    // Показываем нужный инпут и меняем подсказку
+    const hintDiv = document.getElementById('contactHint');
+    if (type === 'phone') {
+        document.getElementById('phoneInput').classList.remove('hidden');
+        hintDiv.textContent = 'Введите номер телефона';
+    } else if (type === 'email') {
+        document.getElementById('emailInput').classList.remove('hidden');
+        hintDiv.textContent = 'Введите email адрес';
+    } else if (type === 'telegram') {
+        document.getElementById('telegramInput').classList.remove('hidden');
+        hintDiv.textContent = 'Введите Telegram username (с @)';
     }
     
-    // Валидация контакта
-    const isPhone = /^[\+]?[789]/.test(contact);
-    const isEmail = /@/.test(contact) && /\./.test(contact);
-    const isTelegram = /^@/.test(contact);
+    // Очищаем ошибку
+    document.getElementById('contactError').classList.add('hidden');
+}
+
+function sharePhone() {
+    // Пытаемся получить номер через Telegram API
+    if (tg.requestContact) {
+        tg.requestContact((result) => {
+            if (result && result.phone_number) {
+                orderData.contact = result.phone_number;
+                orderData.contactType = 'phone';
+                goToStep(8);
+            }
+        });
+    } else {
+        // Если API недоступен, запрашиваем вручную
+        alert('Функция недоступна. Пожалуйста, введите номер вручную.');
+    }
+}
+
+function useTelegram() {
+    // Используем данные пользователя из Telegram
+    if (orderData.username) {
+        orderData.contact = '@' + orderData.username;
+        orderData.contactType = 'telegram';
+        goToStep(8);
+    } else {
+        orderData.contact = 'Telegram ID: ' + orderData.userId;
+        orderData.contactType = 'telegram';
+        goToStep(8);
+    }
+}
+
+function confirmContact() {
+    const errorDiv = document.getElementById('contactError');
+    let contact = '';
     
-    if (isPhone) {
-        const digits = contact.replace(/\D/g, '');
-        if (digits.length < 10) {
-            errorDiv.textContent = 'Номер телефона слишком короткий';
+    if (currentContactType === 'phone') {
+        contact = document.getElementById('phoneInput').value.trim();
+        
+        if (!contact) {
+            errorDiv.textContent = 'Пожалуйста, введите номер телефона';
             errorDiv.classList.remove('hidden');
             return;
         }
-    } else if (isEmail) {
+        
+        // Валидация телефона
+        const digits = contact.replace(/\D/g, '');
+        if (digits.length < 10) {
+            errorDiv.textContent = 'Номер телефона слишком короткий (минимум 10 цифр)';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        
+        if (!/^[\+]?[789]/.test(contact)) {
+            errorDiv.textContent = 'Номер должен начинаться с +, 7, 8 или 9';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        
+        orderData.contact = contact;
+        orderData.contactType = 'phone';
+        
+    } else if (currentContactType === 'email') {
+        contact = document.getElementById('emailInput').value.trim();
+        
+        if (!contact) {
+            errorDiv.textContent = 'Пожалуйста, введите email';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        
+        // Валидация email
+        if (!/@/.test(contact)) {
+            errorDiv.textContent = 'Email должен содержать символ @';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        
         if (/[а-яА-ЯёЁ]/.test(contact)) {
             errorDiv.textContent = 'Email не может содержать кириллицу';
             errorDiv.classList.remove('hidden');
             return;
         }
-    } else if (isTelegram) {
+        
+        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(contact)) {
+            errorDiv.textContent = 'Некорректный формат email';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        
+        orderData.contact = contact;
+        orderData.contactType = 'email';
+        
+    } else if (currentContactType === 'telegram') {
+        contact = document.getElementById('telegramInput').value.trim();
+        
+        if (!contact) {
+            errorDiv.textContent = 'Пожалуйста, введите Telegram username';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        
+        // Валидация Telegram
+        if (!contact.startsWith('@')) {
+            errorDiv.textContent = 'Telegram username должен начинаться с @';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        
         if (contact.length < 6) {
             errorDiv.textContent = 'Telegram username слишком короткий';
             errorDiv.classList.remove('hidden');
             return;
         }
+        
+        orderData.contact = contact;
+        orderData.contactType = 'telegram';
     }
     
-    orderData.contact = contact;
     errorDiv.classList.add('hidden');
     goToStep(8);
 }
@@ -403,7 +515,19 @@ function displaySummary() {
     
     html += `<div class="summary-item">
         <div class="summary-label">Контакт</div>
-        <div class="summary-value">${orderData.contact}</div>
+        <div class="summary-value">`;
+    
+    if (orderData.contactType === 'phone') {
+        html += `📱 ${orderData.contact}`;
+    } else if (orderData.contactType === 'email') {
+        html += `📧 ${orderData.contact}`;
+    } else if (orderData.contactType === 'telegram') {
+        html += `💬 ${orderData.contact}`;
+    } else {
+        html += orderData.contact;
+    }
+    
+    html += `</div>
     </div>`;
     
     summary.innerHTML = html;
