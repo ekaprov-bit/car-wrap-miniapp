@@ -231,6 +231,37 @@ h3 {
     margin-top: 20px;
 }
 
+/* Табы для выбора типа контакта */
+.contact-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.contact-tab {
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid var(--tg-theme-secondary-bg-color, #e0e0e0);
+    background: var(--tg-theme-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #000000);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.contact-tab:active {
+    transform: scale(0.96);
+}
+
+.contact-tab.active {
+    background: var(--tg-theme-button-color, #3390ec);
+    color: var(--tg-theme-button-text-color, #ffffff);
+    border-color: var(--tg-theme-button-color, #3390ec);
+}
+
 /* Инпуты */
 .text-input, .date-input, .time-input, .select-input {
     width: 100%;
