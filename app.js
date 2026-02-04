@@ -59,6 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initAdditionalParts();
     initDateTime();
     initPhotos();
+    
+    // Добавляем обработчик для кнопки отправки
+    const btnSubmit = document.getElementById('btnSubmitOrder');
+    if (btnSubmit) {
+        btnSubmit.addEventListener('click', submitOrder);
+    }
 });
 
 // Шаг 1: Выбор комплекта
@@ -467,6 +473,18 @@ function goToStep(step) {
     
     if (step === 8) {
         displaySummary();
+        
+        // Настраиваем MainButton для отправки
+        if (tg.MainButton) {
+            tg.MainButton.setText('✅ Отправить заявку');
+            tg.MainButton.show();
+            tg.MainButton.onClick(submitOrder);
+        }
+    } else {
+        // Скрываем MainButton на других шагах
+        if (tg.MainButton) {
+            tg.MainButton.hide();
+        }
     }
     
     window.scrollTo(0, 0);
@@ -539,9 +557,76 @@ function goBack() {
 
 // Отправка заявки
 function submitOrder() {
-    // Отправляем данные боту
-    tg.sendData(JSON.stringify(orderData));
-    goToStep(9);
+    try {
+        console.log('=== НАЧАЛО ОТПРАВКИ ЗАЯВКИ ===');
+        console.log('Данные заказа:', orderData);
+        
+        // Проверяем обязательные поля
+        if (!orderData.packageName) {
+            alert('Ошибка: не выбран комплект');
+            return;
+        }
+        if (!orderData.location) {
+            alert('Ошибка: не указана локация');
+            return;
+        }
+        if (!orderData.date || !orderData.time) {
+            alert('Ошибка: не указана дата или время');
+            return;
+        }
+        if (!orderData.photos || orderData.photos.length === 0) {
+            alert('Ошибка: не загружены фотографии');
+            return;
+        }
+        if (!orderData.vin) {
+            alert('Ошибка: не указан VIN-номер');
+            return;
+        }
+        if (!orderData.contact) {
+            alert('Ошибка: не указан контакт');
+            return;
+        }
+        
+        console.log('✓ Все обязательные поля заполнены');
+        
+        // Подготавливаем данные для отправки
+        const dataToSend = JSON.stringify(orderData);
+        console.log('Размер данных:', dataToSend.length, 'символов');
+        
+        // Проверяем доступность Telegram Web App API
+        if (!window.Telegram || !window.Telegram.WebApp) {
+            console.error('Telegram WebApp API недоступен!');
+            alert('Ошибка: приложение должно быть открыто в Telegram');
+            return;
+        }
+        
+        console.log('✓ Telegram WebApp API доступен');
+        console.log('tg.sendData:', typeof tg.sendData);
+        
+        // Отправляем данные
+        if (typeof tg.sendData === 'function') {
+            console.log('Отправка через tg.sendData...');
+            tg.sendData(dataToSend);
+            console.log('✓ Данные отправлены!');
+        } else {
+            console.error('tg.sendData недоступен!');
+            console.log('Доступные методы tg:', Object.keys(tg));
+            alert('Ошибка отправки. Попробуйте обновить приложение.');
+            return;
+        }
+        
+        // Показываем экран успеха
+        console.log('Переход к экрану успеха...');
+        goToStep(9);
+        console.log('=== ОТПРАВКА ЗАВЕРШЕНА ===');
+        
+    } catch (error) {
+        console.error('!!! ОШИБКА ПРИ ОТПРАВКЕ !!!');
+        console.error('Тип ошибки:', error.name);
+        console.error('Сообщение:', error.message);
+        console.error('Stack:', error.stack);
+        alert('Произошла ошибка при отправке заявки:\n' + error.message);
+    }
 }
 
 function restartApp() {
