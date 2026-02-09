@@ -346,19 +346,9 @@ function selectContactType(type) {
 }
 
 function sharePhone() {
-    // Пытаемся получить номер через Telegram API
-    if (tg.requestContact) {
-        tg.requestContact((result) => {
-            if (result && result.phone_number) {
-                orderData.contact = result.phone_number;
-                orderData.contactType = 'phone';
-                goToStep(8);
-            }
-        });
-    } else {
-        // Если API недоступен, запрашиваем вручную
-        alert('Функция недоступна. Пожалуйста, введите номер вручную.');
-    }
+    // Telegram Web App не поддерживает requestContact напрямую
+    // Просим пользователя ввести номер или используем кнопку внизу
+    alert('Пожалуйста, введите номер телефона вручную в поле ниже или выберите другой способ связи');
 }
 
 function useTelegram() {
@@ -367,10 +357,12 @@ function useTelegram() {
         orderData.contact = '@' + orderData.username;
         orderData.contactType = 'telegram';
         goToStep(8);
-    } else {
+    } else if (orderData.userId) {
         orderData.contact = 'Telegram ID: ' + orderData.userId;
         orderData.contactType = 'telegram';
         goToStep(8);
+    } else {
+        alert('Не удалось получить Telegram username. Пожалуйста, введите контакт вручную.');
     }
 }
 
