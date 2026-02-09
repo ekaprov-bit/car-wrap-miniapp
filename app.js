@@ -589,9 +589,38 @@ function submitOrder() {
         
         console.log('✓ Все обязательные поля заполнены');
         
-        // Подготавливаем данные для отправки
-        const dataToSend = JSON.stringify(orderData);
-        console.log('Размер данных:', dataToSend.length, 'символов');
+        // ВАЖНО: Убираем фото из данных (они слишком большие для sendData)
+        // Telegram ограничивает размер до ~4KB
+        const dataToSend = {
+            package: orderData.package,
+            packageName: orderData.packageName,
+            packageDesc: orderData.packageDesc,
+            packagePrice: orderData.packagePrice,
+            additionalParts: orderData.additionalParts,
+            location: orderData.location,
+            locationType: orderData.locationType,
+            latitude: orderData.latitude,
+            longitude: orderData.longitude,
+            date: orderData.date,
+            time: orderData.time,
+            photosCount: orderData.photos.length, // Отправляем только количество
+            vin: orderData.vin,
+            contact: orderData.contact,
+            contactType: orderData.contactType,
+            userId: orderData.userId,
+            username: orderData.username,
+            firstName: orderData.firstName
+        };
+        
+        const jsonData = JSON.stringify(dataToSend);
+        console.log('Размер данных:', jsonData.length, 'символов');
+        
+        // Проверяем размер (макс 4096 байт)
+        if (jsonData.length > 4000) {
+            console.warn('Данные слишком большие:', jsonData.length);
+            alert('Данные слишком большие. Попробуйте уменьшить описание.');
+            return;
+        }
         
         // Проверяем доступность Telegram Web App API
         if (!window.Telegram || !window.Telegram.WebApp) {
@@ -601,16 +630,14 @@ function submitOrder() {
         }
         
         console.log('✓ Telegram WebApp API доступен');
-        console.log('tg.sendData:', typeof tg.sendData);
         
         // Отправляем данные
         if (typeof tg.sendData === 'function') {
             console.log('Отправка через tg.sendData...');
-            tg.sendData(dataToSend);
+            tg.sendData(jsonData);
             console.log('✓ Данные отправлены!');
         } else {
             console.error('tg.sendData недоступен!');
-            console.log('Доступные методы tg:', Object.keys(tg));
             alert('Ошибка отправки. Попробуйте обновить приложение.');
             return;
         }
