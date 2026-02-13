@@ -3,6 +3,16 @@ const tg = window.Telegram.WebApp;
 tg.expand();
 tg.ready();
 
+// Диагностика - выводим информацию о Telegram
+console.log('=== TELEGRAM WEB APP INFO ===');
+console.log('initData:', tg.initData);
+console.log('initDataUnsafe:', tg.initDataUnsafe);
+console.log('version:', tg.version);
+console.log('platform:', tg.platform);
+console.log('User ID:', tg.initDataUnsafe?.user?.id);
+console.log('Bot:', tg.initDataUnsafe?.receiver);
+console.log('===========================');
+
 // Данные заявки
 const orderData = {
     package: null,
