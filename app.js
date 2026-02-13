@@ -478,14 +478,20 @@ function goToStep(step) {
         
         // Настраиваем MainButton для отправки
         if (tg.MainButton) {
+            // Сначала удаляем старые обработчики
+            tg.MainButton.offClick(submitOrder);
+            // Настраиваем кнопку
             tg.MainButton.setText('✅ Отправить заявку');
+            tg.MainButton.enable();
             tg.MainButton.show();
+            // Добавляем обработчик
             tg.MainButton.onClick(submitOrder);
         }
     } else {
         // Скрываем MainButton на других шагах
         if (tg.MainButton) {
             tg.MainButton.hide();
+            tg.MainButton.offClick(submitOrder);
         }
     }
     
